@@ -1,16 +1,12 @@
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
 
-const app = express();
+// Export the handler function for Vercel
+module.exports = async (req, res) => {
+  // Check if the request method is POST
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: "Method not allowed." });
+  }
 
-// Middleware to handle CORS and parse JSON bodies
-app.use(cors());
-app.use(bodyParser.json());
-
-// POST route to handle contact form submission
-app.post('/contact', async (req, res) => {
   const { name, email, phone, message } = req.body;
 
   // Basic validation (ensure all fields are filled)
@@ -50,7 +46,4 @@ app.post('/contact', async (req, res) => {
     console.error('Error sending email:', error);
     return res.status(500).json({ error: "Failed to send message. Please try again later." });
   }
-});
-
-// Export the express app as a serverless function
-module.exports = app;
+};
