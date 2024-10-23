@@ -19,21 +19,27 @@ app.post('/contact', (req, res) => {
     return res.status(400).json({ error: "All fields are required." });
   }
 
-  // Set up nodemailer transport (Gmail example, but you can use other services)
+  // Set up Nodemailer transport
   let transporter = nodemailer.createTransport({
-    service: 'gmail', // Use your preferred email service
+    service: 'gmail',
     auth: {
-      user: 'sibertechnologies1@gmail.com', // Replace with your email address
-      pass: 'zgpk qntq cbwd bfqp',    // Replace with your email password or app-specific password
+      user: 'sibertechnologies1@gmail.com', // Your Gmail address
+      pass: 'nuyd xjgx flqf rqgj', // App-specific password for Gmail
     },
   });
 
   // Email options
   let mailOptions = {
-    from: email, // Senders' email (the user's email from the form)
-    to: 'sibertechs@gmail.com', // Recipient's email (where you want to receive the form data)
-    subject: 'New Contact Form Submission', // Email subject
-    text: `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nMessage: ${message}`, // Email body
+    from: 'sibertechnologies1@gmail.com', // Sender's email (your Gmail address)
+    to: 'sibertechs@gmail.com', // Recipient's email (your email)
+    subject: 'New Contact Form Submission', // Subject of the email
+    text: `You have a new message from your website contact form.\n\n` +
+          `Details:\n` +
+          `Name: ${name}\n` +
+          `Email: ${email}\n` + // Include user's email in the message body
+          `Phone: ${phone}\n` +
+          `Message: ${message}`, // Include user's message in the body
+    replyTo: email, // Reply-To set to the user's email
   };
 
   // Send the email
