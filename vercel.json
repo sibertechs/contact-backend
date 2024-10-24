@@ -1,13 +1,24 @@
 {
     "version": 2,
-    "functions": {
-      "api/**/*.js": {
-        "runtime": "nodejs18.x" 
-      }
-    },
-    "build": {
-      "env": {
+    "builds": [
+        {
+            "src": "api/contact.js",
+            "use": "@vercel/node"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/api/contact",
+            "methods": ["POST", "OPTIONS"],
+            "dest": "/api/contact.js"
+        },
+        {
+            "src": "/api/health",
+            "methods": ["GET"],
+            "dest": "/api/contact.js"
+        }
+    ],
+    "env": {
         "NODE_ENV": "production"
-      }
     }
-  }
+}
