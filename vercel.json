@@ -15,11 +15,6 @@
             "src": "/api/contact",
             "methods": ["POST", "OPTIONS"],
             "dest": "/api/contact.js"
-        },
-        {
-            "src": "/api/health",
-            "methods": ["GET"],
-            "dest": "/api/health.js"
         }
     ],
     "env": {
