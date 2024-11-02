@@ -6,10 +6,10 @@ const bodyParser = require('body-parser');
 
 const app = express();
 
-// CORS configuration - be more permissive for troubleshooting
+// CORS configuration
 app.use(cors({
-    origin: '*', // Allow all origins temporarily
-    methods: ['POST', 'OPTIONS'],
+    origin: '*',
+    methods: ['POST', 'OPTIONS', 'GET'], // Added GET for health check
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -18,18 +18,21 @@ app.use(cors({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Options pre-flight request
-app.options('/api/contact', cors());
+// Pre-flight requests
+app.options('*', cors()); // Handle OPTIONS for all routes
+
+// Health check endpoint (moved up)
+app.get('/api/health', (req, res) => {
+    return res.status(200).json({ status: 'OK' });
+});
 
 // Main contact endpoint
 app.post('/api/contact', async (req, res) => {
     try {
-        // Log incoming request
         console.log('Received request:', req.body);
-
+        
         const { name, email, phone, message } = req.body;
 
-        // Validate input
         if (!name || !email || !phone || !message) {
             console.log('Validation failed:', { name, email, phone, message });
             return res.status(400).json({
@@ -38,19 +41,14 @@ app.post('/api/contact', async (req, res) => {
             });
         }
 
-        // Configure transporter
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS
-            },
-            tls: {
-                rejectUnauthorized: false // Only use this in development
             }
         });
 
-        // Email options
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: 'sibertechs@gmail.com',
@@ -64,7 +62,6 @@ app.post('/api/contact', async (req, res) => {
             replyTo: email
         };
 
-        // Send email
         await transporter.sendMail(mailOptions);
         console.log('Email sent successfully');
 
@@ -82,28 +79,23 @@ app.post('/api/contact', async (req, res) => {
     }
 });
 
-// Basic health check endpoint
-app.get('/api/health', (req, res) => {
-    res.status(200).json({ status: 'OK' });
-});
-
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error('Global error:', err);
-    res.status(500).json({
+    return res.status(500).json({
         success: false,
         error: 'An unexpected error occurred'
     });
 });
 
-// Export for Vercel
-module.exports = app;
-
-// Local development server
+// For local development
 if (process.env.NODE_ENV !== 'production') {
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);
-        console.log('Email User:', process.env.EMAIL_USER); // Log email config
+        console.log('Email User:', process.env.EMAIL_USER);
     });
 }
+
+// Export the Express app
+module.exports = app;
