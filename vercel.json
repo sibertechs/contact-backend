@@ -4,10 +4,6 @@
         {
             "src": "api/contact.js",
             "use": "@vercel/node"
-        },
-        {
-            "src": "api/health.js",
-            "use": "@vercel/node"
         }
     ],
     "routes": [
